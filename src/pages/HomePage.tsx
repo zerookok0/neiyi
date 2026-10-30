@@ -1,9 +1,10 @@
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Reveal } from '../components/Reveal';
 import { ProductCard } from '../components/ProductCard';
 import { RatingStars } from '../components/RatingStars';
 import { GarmentArt } from '../components/GarmentArt';
+import PerspectiveTunnelHero from '../components/ui/perspective-tunnel-hero';
 import {
   ArrowRight,
   BraGlyph,
@@ -19,29 +20,8 @@ import { usePageTitle } from '../components/PageTopBar';
 import { products } from '../data/products';
 import { categories, collections, benefits, testimonials } from '../data/catalog';
 import { IMG } from '../data/types';
-import { formatVND, cx } from '../lib/format';
+import { formatVND } from '../lib/format';
 import type { Audience } from '../data/types';
-
-const HERO_SLIDES = [
-  {
-    image: IMG.mood1,
-    eyebrow: 'Bộ sưu tập Thu Đông 2025',
-    title: 'Vẻ đẹp bắt đầu\n từ cảm giác.',
-    text: 'Dịu dàng trên da, tự tin trong từng khoảnh khắc.',
-  },
-  {
-    image: IMG.mood3,
-    eyebrow: 'Dành cho nữ',
-    title: 'Mặc như\n không mặc.',
-    text: 'Áo ngực không gọng, quần lót seamless, phom theo số đo người Việt.',
-  },
-  {
-    image: IMG.mood6,
-    eyebrow: 'Dành cho nam',
-    title: 'Thoáng mát\n cả ngày dài.',
-    text: 'Trunk túi nâng đỡ, áo lót cotton giữ phom — dòng Daily Motion.',
-  },
-];
 
 export function HomePage() {
   usePageTitle('Trang chủ');
@@ -50,7 +30,7 @@ export function HomePage() {
 
   return (
     <>
-      <Hero />
+      <PerspectiveTunnelHero />
       <AudienceSplit />
       <CategoryStrip />
       <CollectionFeature />
@@ -75,93 +55,6 @@ export function HomePage() {
   );
 }
 
-function Hero() {
-  const [index, setIndex] = useState(0);
-  const timer = useRef<number | null>(null);
-
-  useEffect(() => {
-    timer.current = window.setInterval(() => setIndex((i) => (i + 1) % HERO_SLIDES.length), 6500);
-    return () => {
-      if (timer.current) window.clearInterval(timer.current);
-    };
-  }, []);
-
-  const slide = HERO_SLIDES[index];
-
-  return (
-    <section className="relative h-[100svh] min-h-[560px] w-full overflow-hidden bg-ink">
-      {HERO_SLIDES.map((s, i) => (
-        <div
-          key={s.image}
-          className={cx(
-            'absolute inset-0 transition-opacity duration-[1400ms] ease-silk',
-            i === index ? 'opacity-100' : 'opacity-0',
-          )}
-        >
-          <img
-            src={s.image}
-            alt={s.eyebrow}
-            className="editorial-img h-full w-full object-cover"
-            style={{ objectPosition: '50% 32%' }}
-            loading={i === 0 ? 'eager' : 'lazy'}
-          />
-        </div>
-      ))}
-
-      <div className="absolute inset-0 bg-gradient-to-t from-ink/80 via-ink/25 to-ink/30" />
-      <div className="absolute inset-0 bg-[radial-gradient(120%_80%_at_50%_100%,rgba(31,28,26,0.55),transparent_62%)]" />
-
-      <div className="relative flex h-full flex-col justify-end px-6 pb-24 pt-24 text-ivory md:justify-center md:pb-24 md:pl-[7vw]">
-        <div className="max-w-[540px]">
-          <p key={`e-${index}`} className="animate-fadeIn font-sans text-[10px] uppercase tracking-wide3 text-ivory/70">
-            {slide.eyebrow}
-          </p>
-          <h1 key={`t-${index}`} className="display-xl mt-4 whitespace-pre-line animate-riseIn text-ivory">
-            {slide.title}
-          </h1>
-          <p
-            key={`s-${index}`}
-            className="mt-5 max-w-[340px] animate-riseIn font-sans text-[13.5px] font-light leading-relaxed text-ivory/78"
-          >
-            {slide.text}
-          </p>
-          <div className="mt-8 flex flex-wrap items-center gap-3">
-            <Link to="/nu" className="btn-light group">
-              Bộ sưu tập Nữ
-              <ArrowRight size={16} className="transition-transform duration-500 group-hover:translate-x-1" />
-            </Link>
-            <Link to="/nam" className="btn btn border border-ivory/40 text-ivory hover:bg-ivory hover:text-ink">
-              Bộ sưu tập Nam
-            </Link>
-          </div>
-        </div>
-      </div>
-
-      <div className="absolute inset-x-0 bottom-[26px] flex items-center justify-between px-6 md:bottom-9 md:px-[7vw]">
-        <div className="flex items-center gap-3 font-sans text-[10.5px] tracking-[0.14em] text-ivory/70">
-          <span className="text-ivory">0{index + 1}</span>
-          <span className="h-px w-10 bg-ivory/35" />
-          <span>0{HERO_SLIDES.length}</span>
-        </div>
-        <div className="flex gap-1.5">
-          {HERO_SLIDES.map((_, i) => (
-            <button
-              key={i}
-              type="button"
-              onClick={() => setIndex(i)}
-              aria-label={`Chuyển đến ảnh ${i + 1}`}
-              className={cx(
-                'h-[2px] transition-all duration-500',
-                i === index ? 'w-8 bg-ivory' : 'w-4 bg-ivory/40',
-              )}
-            />
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
 function AudienceSplit() {
   const cards: { key: Audience; title: string; copy: string; to: string; garment: 'bra' | 'trunk' }[] = [
     {
@@ -181,10 +74,12 @@ function AudienceSplit() {
   ];
 
   return (
-    <section className="mx-auto -mt-px w-full max-w-[1180px] px-4 pt-10 md:px-8 md:pt-14">
+    <section className="relative mx-auto w-full max-w-[1180px] px-4 pt-12 md:px-8 md:pt-16">
+      {/* Soft ivory gradient so the cards emerge out of the hero rather than cut in. */}
+      <div className="pointer-events-none absolute inset-x-0 -top-32 h-32 bg-gradient-to-b from-transparent to-ivory" />
       <div className="grid grid-cols-2 gap-3 md:gap-5">
         {cards.map((c, i) => (
-          <Reveal key={c.key} delay={i * 80}>
+          <Reveal key={c.key} delay={i * 90}>
             <Link
               to={c.to}
               className="tap group flex h-full flex-col overflow-hidden rounded-[18px] border border-ink/[0.08] bg-cream/45"
